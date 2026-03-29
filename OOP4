@@ -1,0 +1,61 @@
+class NhanVien:
+    LUONG_MAX = 50000.0 
+
+    def __init__(self, tenNhanVien, luongCoBan, heSoLuong):
+        self.__tenNhanVien = tenNhanVien
+        self.__luongCoBan = luongCoBan
+        self.__heSoLuong = heSoLuong
+
+    def get_tenNhanVien(self):
+        return self.__tenNhanVien
+
+    def get_luongCoBan(self):
+        return self.__luongCoBan
+
+    def get_heSoLuong(self):
+        return self.__heSoLuong
+
+    def set_tenNhanVien(self, tenNhanVien):
+        self.__tenNhanVien = tenNhanVien
+
+    def set_luongCoBan(self, luongCoBan):
+        self.__luongCoBan = luongCoBan
+
+    def set_heSoLuong(self, heSoLuong):
+        self.__heSoLuong = heSoLuong
+
+    def tinhLuong(self):
+        return self.__luongCoBan * self.__heSoLuong
+
+    def inTTin(self):
+        print("--- Thông Tin Nhân Viên ---")
+        print("Tên nhân viên:", self.__tenNhanVien)
+        print("Lương cơ bản:", self.__luongCoBan)
+        print("Hệ số lương:", self.__heSoLuong)
+        print("Tổng lương:", self.tinhLuong())
+        print("--------------------------")
+
+    def tangLuong(self, k):
+        he_so_moi = self.__heSoLuong + k
+        luong_du_kien = self.__luongCoBan * he_so_moi
+        
+        if luong_du_kien > self.LUONG_MAX:
+            print("Thất bại: Lương vượt quá mức tối đa!")
+            return False
+        else:
+            self.__heSoLuong = he_so_moi
+            return True
+
+if __name__ == "__main__":
+    nv = NhanVien("Nguyễn Văn A", 10000.0, 2.0)
+    nv.inTTin()
+    
+    print(">> Thử tăng hệ số lương thêm 1.0...")
+    if nv.tangLuong(1.0):
+        print("Thành công!")
+    nv.inTTin()
+    
+    print(">> Thử tăng hệ số lương thêm 5.0...")
+    if nv.tangLuong(5.0):
+        print("Thành công!")
+    nv.inTTin()
