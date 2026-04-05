@@ -1,0 +1,90 @@
+class HangHoa:
+    def __init__(self, ma_hang, ten_hang, nha_sx, gia):
+        # Các thuộc tính chung của mọi loại hàng hóa
+        self.ma_hang = ma_hang
+        self.ten_hang = ten_hang
+        self.nha_sx = nha_sx
+        self.gia = gia
+
+    def xuat_thong_tin(self):
+        # Phương thức hiển thị thông tin cơ bản
+        return f"Mã: {self.ma_hang} | Tên: {self.ten_hang} | NSX: {self.nha_sx} | Giá: {self.gia:,.0f} VNĐ"
+
+
+class HangDienMay(HangHoa):
+    def __init__(self, ma_hang, ten_hang, nha_sx, gia, tg_baohanh, dien_ap, cong_suat):
+        # Gọi hàm khởi tạo của lớp cha (HangHoa)
+        super().__init__(ma_hang, ten_hang, nha_sx, gia)
+        # Các thuộc tính riêng của Hàng điện máy
+        self.tg_baohanh = tg_baohanh
+        self.dien_ap = dien_ap
+        self.cong_suat = cong_suat
+
+    def xuat_thong_tin(self):
+        # Ghi đè (override) phương thức xuất thông tin
+        thong_tin_co_ban = super().xuat_thong_tin()
+        return f"[Điện Máy] {thong_tin_co_ban} | Bảo hành: {self.tg_baohanh} tháng | Điện áp: {self.dien_ap}V | Công suất: {self.cong_suat}W"
+
+
+class HangSanhSu(HangHoa):
+    def __init__(self, ma_hang, ten_hang, nha_sx, gia, loai_nguyen_lieu):
+        super().__init__(ma_hang, ten_hang, nha_sx, gia)
+        # Thuộc tính riêng của Hàng sành sứ
+        self.loai_nguyen_lieu = loai_nguyen_lieu
+
+    def xuat_thong_tin(self):
+        thong_tin_co_ban = super().xuat_thong_tin()
+        return f"[Sành Sứ] {thong_tin_co_ban} | Nguyên liệu: {self.loai_nguyen_lieu}"
+
+
+class HangThucPham(HangHoa):
+    def __init__(self, ma_hang, ten_hang, nha_sx, gia, ngay_sx, ngay_hethan):
+        super().__init__(ma_hang, ten_hang, nha_sx, gia)
+        # Thuộc tính riêng của Hàng thực phẩm
+        self.ngay_sx = ngay_sx
+        self.ngay_hethan = ngay_hethan
+
+    def xuat_thong_tin(self):
+        thong_tin_co_ban = super().xuat_thong_tin()
+        return f"[Thực Phẩm] {thong_tin_co_ban} | NSX: {self.ngay_sx} | HSD: {self.ngay_hethan}"
+
+
+# ==========================================
+# CHƯƠNG TRÌNH CHÍNH (Tạo đối tượng và xuất thông tin)
+# ==========================================
+if __name__ == "__main__":
+    # 1. Tạo một mặt hàng điện máy
+    dien_may = HangDienMay(
+        ma_hang="DM001", 
+        ten_hang="Tủ lạnh Inverter", 
+        nha_sx="Samsung", 
+        gia=12000000, 
+        tg_baohanh=24, 
+        dien_ap=220, 
+        cong_suat=150
+    )
+
+    # 2. Tạo một mặt hàng sành sứ
+    sanh_su = HangSanhSu(
+        ma_hang="SS001", 
+        ten_hang="Bộ ấm trà Bát Tràng", 
+        nha_sx="Gốm sứ Bát Tràng", 
+        gia=850000, 
+        loai_nguyen_lieu="Đất sét trắng"
+    )
+
+    # 3. Tạo một mặt hàng thực phẩm
+    thuc_pham = HangThucPham(
+        ma_hang="TP001", 
+        ten_hang="Sữa tươi tiệt trùng", 
+        nha_sx="Vinamilk", 
+        gia=35000, 
+        ngay_sx="01/04/2026", 
+        ngay_hethan="01/10/2026"
+    )
+
+    # Xuất thông tin các mặt hàng ra màn hình
+    print("--- DANH SÁCH MẶT HÀNG ---")
+    print(dien_may.xuat_thong_tin())
+    print(sanh_su.xuat_thong_tin())
+    print(thuc_pham.xuat_thong_tin())
