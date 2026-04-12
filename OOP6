@@ -1,0 +1,135 @@
+import pickle
+import os
+
+class GiaKhongHopLe(Exception):
+    pass
+
+class MaHangTrungLap(Exception):
+    pass
+
+class HangHoa:
+    def __init__(self, ma_hang, ten_hang, nha_sx, gia):
+        if gia < 0:
+            raise GiaKhongHopLe("Lỗi: Giá sản phẩm không hợp lệ (phải >= 0)!")
+        self.ma_hang = ma_hang
+        self.ten_hang = ten_hang
+        self.nha_sx = nha_sx
+        self.gia = gia  
+
+    def loai_hang(self):
+        pass
+
+    def in_thong_tin(self):
+        pass
+
+    def lay_thong_tin_chung(self):
+        gia_format = f"{self.gia:,.0f}"
+        return f"| {self.ma_hang:<8} | {self.ten_hang:<22} | {self.nha_sx:<15} | {gia_format:>15} | {self.loai_hang():<12}"
+
+
+class HangDienMay(HangHoa):
+    def __init__(self, ma_hang, ten_hang, nha_sx, gia, tg_baohanh, dien_ap, cong_suat):
+        super().__init__(ma_hang, ten_hang, nha_sx, gia)
+        self.tg_baohanh = tg_baohanh
+        self.dien_ap = dien_ap
+        self.cong_suat = cong_suat
+
+    def loai_hang(self):
+        return "Điện Máy"
+
+    def in_thong_tin(self):
+        chi_tiet = f"BH: {self.tg_baohanh} tháng, {self.dien_ap}V, {self.cong_suat}W"
+        return f"{self.lay_thong_tin_chung()} | {chi_tiet:<38} |"
+
+
+class HangSanhSu(HangHoa):
+    def __init__(self, ma_hang, ten_hang, nha_sx, gia, loai_nguyenlieu):
+        super().__init__(ma_hang, ten_hang, nha_sx, gia)
+        self.loai_nguyenlieu = loai_nguyenlieu
+
+    def loai_hang(self):
+        return "Sành Sứ"
+
+    def in_thong_tin(self):
+        chi_tiet = f"Chất liệu: {self.loai_nguyenlieu}"
+        return f"{self.lay_thong_tin_chung()} | {chi_tiet:<38} |"
+
+
+class HangThucPham(HangHoa):
+    def __init__(self, ma_hang, ten_hang, nha_sx, gia, ngay_sx, ngay_hethan):
+        super().__init__(ma_hang, ten_hang, nha_sx, gia)
+        self.ngay_sx = ngay_sx
+        self.ngay_hethan = ngay_hethan
+
+    def loai_hang(self):
+        return "Thực Phẩm"
+
+    def in_thong_tin(self):
+        chi_tiet = f"HSD: {self.ngay_sx} -> {self.ngay_hethan}"
+        return f"{self.lay_thong_tin_chung()} | {chi_tiet:<38} |"
+
+
+class QuanLyHangHoa:
+    def __init__(self):
+        self.danh_sach = []
+
+    def them_hang(self, sp):
+        for hang_co_san in self.danh_sach:
+            if hang_co_san.ma_hang == sp.ma_hang:
+                raise MaHangTrungLap(f"Lỗi: Mã hàng '{sp.ma_hang}' đã tồn tại!")
+        self.danh_sach.append(sp)
+
+    def in_bang(self):
+        header = f"| {'Mã Hàng':<8} | {'Tên Sản Phẩm':<22} | {'Nhà SX':<15} | {'Giá Bán (VNĐ)':>15} | {'Loại':<12} | {'Thông Tin Đặc Thù':<38} |"
+        print("-" * len(header))
+        print(header)
+        print("-" * len(header))
+        
+        # Sắp xếp danh sách theo giá tăng dần
+        self.danh_sach.sort(key=lambda x: x.gia)
+        
+        for sp in self.danh_sach:
+            print(sp.in_thong_tin())
+            
+        print("-" * len(header))
+
+    def luu_file(self, ten_file="data_hanghoa.pkl"):
+        with open(ten_file, "wb") as f:
+            pickle.dump(self.danh_sach, f)
+        print(f"[+] Đã lưu {len(self.danh_sach)} mặt hàng vào '{ten_file}'")
+
+    def doc_file(self, ten_file="data_hanghoa.pkl"):
+        if os.path.exists(ten_file):
+            with open(ten_file, "rb") as f:
+                self.danh_sach = pickle.load(f)
+            print(f"[+] Đã khôi phục {len(self.danh_sach)} mặt hàng từ '{ten_file}'")
+        else:
+            print(f"[!] File '{ten_file}' không tồn tại.")
+
+
+if __name__ == "__main__":
+    ql = QuanLyHangHoa()
+
+    print("\n[1] TEST THÊM HÀNG VÀ BẮT NGOẠI LỆ (EXCEPTIONS)")
+    ql.them_hang(HangDienMay("DM001", "Máy lạnh Daikin", "Daikin", 12500000, 24, 220, 1500))
+    ql.them_hang(HangDienMay("DM002", "Tủ lạnh Aqua", "Aqua", 6500000, 12, 220, 180))
+    ql.them_hang(HangSanhSu("SS001", "Bộ ấm trà Bát Tràng", "Bát Tràng", 850000, "Men rạn"))
+    ql.them_hang(HangThucPham("TP001", "Sữa tươi tiệt trùng", "Vinamilk", 35000, "10/04/2026", "10/10/2026"))
+
+    try:
+        sp_loi = HangDienMay("DM003", "Quạt hỏng", "Senko", -100, 12, 220, 45)
+    except GiaKhongHopLe as e:
+        print(e)
+
+    try:
+        ql.them_hang(HangSanhSu("SS001", "Bình hoa", "Bát Tràng", 150000, "Gốm"))
+    except MaHangTrungLap as e:
+        print(e)
+
+    print("\n[2] BẢNG HÀNG HÓA (Đã sắp xếp giá tăng dần)")
+    ql.in_bang()
+
+    print("\n[3] TEST LƯU/ĐỌC FILE")
+    ql.luu_file()
+    ql.danh_sach.clear()
+    ql.doc_file()
